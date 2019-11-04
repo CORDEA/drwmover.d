@@ -1,3 +1,4 @@
+import std.algorithm.sorting;
 import std.getopt;
 import std.stdio;
 import std.range;
@@ -31,6 +32,8 @@ void main(string[] args)
     assert(target.isDir);
 
     auto fileName = name ~ ".png";
-    auto filePath = buildPath(source, name ~ "*.png");
-    writeln(filePath);
+    alias comp = (x, y) => getSize(x) < getSize(y);
+    auto sortedFiles = dirEntries(source, name ~ "*.png", SpanMode.shallow).array.sort!(comp);
+    foreach (s; sortedFiles)
+        writeln(s);
 }
