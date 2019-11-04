@@ -13,7 +13,7 @@ enum Dpis = [
     "xxhdpi",
     "xxxhdpi"
 ];
-enum Path = "src/main/res/drwable-";
+enum Path = "src/main/res/drawable-";
 
 string source;
 string target;
