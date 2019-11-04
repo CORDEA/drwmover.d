@@ -1,9 +1,19 @@
+import std.algorithm.iteration;
 import std.algorithm.sorting;
 import std.getopt;
 import std.stdio;
 import std.range;
 import std.file;
 import std.path;
+
+enum Dpis = [
+    "mdpi",
+    "hdpi",
+    "xhdpi",
+    "xxhdpi",
+    "xxxhdpi"
+];
+enum Path = "src/main/res/drwable-";
 
 string source;
 string target;
@@ -34,6 +44,7 @@ void main(string[] args)
     auto fileName = name ~ ".png";
     alias comp = (x, y) => getSize(x) < getSize(y);
     auto sortedFiles = dirEntries(source, name ~ "*.png", SpanMode.shallow).array.sort!(comp);
-    foreach (s; sortedFiles)
+    auto paths = Dpis.map!(dpi => buildPath(target, Path ~ dpi));
+    foreach (s; paths)
         writeln(s);
 }
