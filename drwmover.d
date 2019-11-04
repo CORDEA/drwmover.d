@@ -44,7 +44,11 @@ void main(string[] args)
     auto fileName = name ~ ".png";
     alias comp = (x, y) => getSize(x) < getSize(y);
     auto sortedFiles = dirEntries(source, name ~ "*.png", SpanMode.shallow).array.sort!(comp);
-    auto paths = Dpis.map!(dpi => buildPath(target, Path ~ dpi));
-    foreach (s; paths)
-        writeln(s);
+    assert(sortedFiles.length > 4);
+    auto paths = Dpis.map!(dpi => buildPath(target, Path ~ dpi, fileName));
+
+    foreach (source, target; zip(sortedFiles, paths))
+    {
+        source.copy(target);
+    }
 }
