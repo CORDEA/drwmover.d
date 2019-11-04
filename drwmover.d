@@ -1,4 +1,5 @@
 import std.getopt;
+import std.file;
 
 string source;
 string target;
@@ -15,5 +16,12 @@ void main(string[] args)
     if (help.helpWanted)
     {
         defaultGetoptPrinter("", help.options);
+        return;
     }
+
+    assert(source.exists);
+    assert(source.isDir);
+
+    assert(target.exists);
+    assert(target.isDir);
 }
