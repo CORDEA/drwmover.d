@@ -15,6 +15,11 @@ enum Dpis = [
 ];
 enum Path = "src/main/res/drawable-";
 
+enum Delimiters = [
+    "@",
+    "-"
+];
+
 string source;
 string target;
 string name;
@@ -43,7 +48,13 @@ void main(string[] args)
 
     auto fileName = name ~ ".png";
     alias comp = (x, y) => getSize(x) < getSize(y);
-    auto sortedFiles = dirEntries(source, name ~ "*.png", SpanMode.shallow).array.sort!(comp);
+    auto sortedFiles = Delimiters
+        .map!(delimiter => dirEntries(source, name ~ delimiter ~ "*.png", SpanMode.shallow))
+        .filter!(files => !files.empty)
+        .array[0]
+        .array
+        .sort!(comp);
+
     assert(sortedFiles.length > 4);
     auto paths = Dpis.map!(dpi => buildPath(target, Path ~ dpi, fileName));
 
