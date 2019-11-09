@@ -1,3 +1,4 @@
+import std.experimental.logger;
 import std.algorithm.iteration;
 import std.algorithm.sorting;
 import std.getopt;
@@ -38,24 +39,40 @@ void main(string[] args)
         return;
     }
 
-    assert(!name.empty);
+    if (name.empty)
+    {
+        fatal("Name is empty.");
+    }
 
-    assert(source.exists);
-    assert(source.isDir);
+    if (!source.exists || !source.isDir)
+    {
+        fatal("Source dir not found.");
+    }
 
-    assert(target.exists);
-    assert(target.isDir);
+    if (!target.exists || !target.isDir)
+    {
+        fatal("Target dir not found.");
+    }
 
     auto fileName = name ~ ".png";
-    alias comp = (x, y) => getSize(x) < getSize(y);
-    auto sortedFiles = Delimiters
+    auto files = Delimiters
         .map!(delimiter => dirEntries(source, name ~ delimiter ~ "*.png", SpanMode.shallow))
         .filter!(files => !files.empty)
-        .array[0]
-        .array
-        .sort!(comp);
+        .array;
 
-    assert(sortedFiles.length > 4);
+    if (files.empty)
+    {
+        fatal("Source images not found.");
+    }
+
+    alias comp = (x, y) => getSize(x) < getSize(y);
+    auto sortedFiles = files[0].array.sort!(comp);
+
+    if (sortedFiles.length != 5)
+    {
+        fatal("Requires 5 files.");
+    }
+
     auto paths = Dpis.map!(dpi => buildPath(target, Path ~ dpi, fileName));
 
     foreach (source, target; zip(sortedFiles, paths))
