@@ -16,7 +16,8 @@ enum Dpis = [
     "xxhdpi",
     "xxxhdpi"
 ];
-enum Path = "src/main/res/drawable-";
+enum Path = "src/main/res";
+enum DrawablePath = "drawable-";
 
 enum Delimiters = [
     "@",
@@ -52,7 +53,7 @@ void move(string source, string target, string name) {
         fatal("Requires 5 files.");
     }
 
-    auto paths = Dpis.map!(dpi => buildPath(target, Path ~ dpi, fileName));
+    auto paths = buildPaths(target, fileName);
 
     foreach (src, tgt; zip(sortedFiles, paths))
     {
@@ -67,6 +68,10 @@ void move(string source, string target) {
     auto tgtName = target.baseName();
 
     if (tgtDir.endsWith("*"))
+    {
+        tgtDir = tgtDir.chop();
+    }
+    if (tgtDir[$-1].isDirSeparator())
     {
         tgtDir = tgtDir.chop();
     }
@@ -99,7 +104,7 @@ void move(string source, string target) {
         fatal("Requires 5 files.");
     }
 
-    auto paths = Dpis.map!(dpi => buildPath(tgtDir, Path ~ dpi, tgtFileName));
+    auto paths = buildPaths(tgtDir, tgtFileName);
 
     foreach (src, tgt; zip(sortedFiles, paths))
     {
@@ -123,4 +128,20 @@ private auto getSrcDirEntries(string dir, string name, string delimiter) {
 private auto getSortedFiles(DirEntry[] files) {
     alias comp = (x, y) => getSize(x) < getSize(y);
     return files.array.sort!(comp);
+}
+
+private auto buildPaths(string dir, string name) {
+    alias map = delegate(string dpi) {
+        string fullDirPath;
+        if (dir.endsWith(Path))
+        {
+            fullDirPath = buildPath(dir, DrawablePath ~ dpi, name);
+        }
+        else
+        {
+            fullDirPath = buildPath(dir, Path, DrawablePath ~ dpi, name);
+        }
+        return fullDirPath;
+    };
+    return Dpis.map!(map);
 }
