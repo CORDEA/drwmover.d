@@ -3,6 +3,7 @@ module handler;
 import std.experimental.logger;
 import std.algorithm.iteration;
 import std.algorithm.sorting;
+import std.algorithm;
 import std.range;
 import std.file;
 import std.path;
@@ -34,7 +35,7 @@ void move(string source, string target, string name) {
 
     auto fileName = name ~ ".png";
     auto files = Delimiters
-        .map!(delimiter => dirEntries(source, name ~ delimiter ~ "*.png", SpanMode.shallow))
+        .map!(delimiter => getSrcDirEntries(source, name, delimiter))
         .filter!(files => !files.empty)
         .array;
 
@@ -77,7 +78,7 @@ void move(string source, string target) {
 
     auto tgtFileName = tgtName ~ ".png";
     auto srcFiles = Delimiters
-        .map!(delimiter => dirEntries(srcDir, srcName ~ delimiter ~ "*.png", SpanMode.shallow))
+        .map!(delimiter => getSrcDirEntries(srcDir, srcName, delimiter))
         .filter!(files => !files.empty)
         .array;
 
@@ -100,4 +101,17 @@ void move(string source, string target) {
     {
         src.copy(tgt);
     }
+}
+
+private auto getSrcDirEntries(string dir, string name, string delimiter) {
+    string fileName;
+    if (name.endsWith(delimiter))
+    {
+        fileName = name ~ "*.png";
+    }
+    else
+    {
+        fileName = name ~ delimiter ~ "*.png";
+    }
+    return dirEntries(dir, fileName, SpanMode.shallow);
 }
