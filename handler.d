@@ -4,6 +4,7 @@ import std.experimental.logger;
 import std.algorithm.iteration;
 import std.algorithm.sorting;
 import std.algorithm;
+import std.string;
 import std.range;
 import std.file;
 import std.path;
@@ -60,10 +61,15 @@ void move(string source, string target, string name) {
 }
 
 void move(string source, string target) {
-    auto srcDir = dirName(source);
-    auto tgtDir = dirName(target);
-    auto srcName = baseName(source);
-    auto tgtName = baseName(target);
+    auto srcDir = source.expandTilde().dirName();
+    auto tgtDir = target.expandTilde().dirName();
+    auto srcName = source.baseName();
+    auto tgtName = target.baseName();
+
+    if (tgtDir.endsWith("*"))
+    {
+        tgtDir = tgtDir.chop();
+    }
 
     if (!srcDir.exists || !srcDir.isDir)
     {
