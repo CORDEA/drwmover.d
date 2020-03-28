@@ -44,8 +44,7 @@ void move(string source, string target, string name) {
         fatal("Source images not found.");
     }
 
-    alias comp = (x, y) => getSize(x) < getSize(y);
-    auto sortedFiles = files[0].array.sort!(comp);
+    auto sortedFiles = getSortedFiles(files[0].array);
 
     if (sortedFiles.length != 5)
     {
@@ -87,8 +86,7 @@ void move(string source, string target) {
         fatal("Source images not found.");
     }
 
-    alias comp = (x, y) => getSize(x) < getSize(y);
-    auto sortedFiles = srcFiles[0].array.sort!(comp);
+    auto sortedFiles = getSortedFiles(srcFiles[0].array);
 
     if (sortedFiles.length != 5)
     {
@@ -114,4 +112,9 @@ private auto getSrcDirEntries(string dir, string name, string delimiter) {
         fileName = name ~ delimiter ~ "*.png";
     }
     return dirEntries(dir, fileName, SpanMode.shallow);
+}
+
+private auto getSortedFiles(DirEntry[] files) {
+    alias comp = (x, y) => getSize(x) < getSize(y);
+    return files.array.sort!(comp);
 }
